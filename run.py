@@ -22,14 +22,12 @@ app.jinja_env.globals.update(t=t)
 
 def conn():
     return pymysql.connect(
-        host=os.getenv('DB_HOST'),
-        user=os.getenv('DB_USER'),
-        password=os.getenv('DB_PASSWORD'),
-        database=os.getenv('DB_NAME'),
-        port=int(os.getenv('DB_PORT', 3306)),
-        cursorclass=pymysql.cursors.DictCursor,
-        autocommit=True
-    )
+    host=os.getenv('DB_HOST'),
+    port=int(os.getenv('DB_PORT')),
+    user=os.getenv('DB_USER'),
+    password=os.getenv('DB_PASSWORD'),
+    database=os.getenv('DB_NAME')
+)
 
 def one(sql,args=()):
     c=conn();
