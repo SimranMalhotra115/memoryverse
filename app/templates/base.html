@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>
+            {{ t('brand') }}
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/static/css/style.css">
+    </head>
+    <body class="{{ session.get('mode','dark') }}">
+        <nav class="nav">
+            <a href="/" class="brand">
+                <span class="logo">✨</span>
+                {{ t('brand') }}</a>
+                <div class="nav-links">
+                    <a href="/lang/en">EN</a>
+                    <a href="/lang/hi">हिंदी</a>
+                    <a href="/mode/light">☀️</a>
+                    <a href="/mode/dark">🌙</a>
+                    {% if session.get('user_id') %}
+                    <a href="/dashboard">
+                        {{ t('dashboard') }}
+                    </a>
+                    <a href="/logout">{{ t('logout') }}</a>
+                    {% else %}
+                    <a href="/login">
+                        {{ t('login') }}</a>
+                        <a class="btn small" href="/register">
+                            {{ t('start') }}
+                        </a>{% endif %}
+                    </div>
+                </nav>
+                <main class="container">
+                    {% with messages=get_flashed_messages() %}{% if messages %}
+                    <div class="flash">{% for msg in messages %}<p>{{ msg }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    {% block content %}
+                    {% endblock %}</main>
+                </body>
+                </html>

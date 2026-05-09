@@ -1,0 +1,493 @@
+<!doctype html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ event.title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="experience {{ event.appearance }} event-{{ event.event_type }}">
+
+<div class="sparkles"></div>
+
+<audio id="bgMusic" loop>
+    <source
+      src="{{ url_for('static', filename='music/bgmusic.mp3') }}"
+      type="audio/mpeg">
+</audio>
+
+<button class="mode-float"
+onclick="document.body.classList.toggle('light')">
+🌙/☀️ </button>
+
+<section class="public-hero hero">
+
+```
+<div>
+
+    <div class="badge">{{ event.event_type }}</div>
+
+    <h1>{{ event.title }}</h1>
+
+    <p>
+        For <b>{{ event.receiver_name }}</b>
+    </p>
+
+    <p>{{ event.subtitle }}</p>
+
+    <button class="btn"
+    onclick="document.getElementById('sky').scrollIntoView({behavior:'smooth'})">
+        Start Journey
+    </button>
+
+</div>
+```
+
+</section>
+
+<section id="sky" class="section">
+
+<h2>🌌 Sky of Memories</h2>
+
+<div class="stars">
+
+{% for m in memories %}
+
+<button class="star"
+onclick="openMemory(this)">
+★ </button>
+
+{% endfor %}
+
+</div>
+
+</section>
+
+<section class="section">
+
+<h2>📖 Timeline</h2>
+
+{% for m in memories %}
+
+<div class="timeline-item">
+
+```
+<h3>{{ m.title }}</h3>
+
+<p>{{ m.description }}</p>
+```
+
+</div>
+
+{% endfor %}
+
+</section>
+
+<section class="section">
+
+<h2>🎮 Mini Game</h2>
+
+<canvas id="game"
+width="860"
+height="620"> </canvas>
+
+<br>
+
+<button onclick="move(-1)">⬅️</button> <button onclick="move(1)">➡️</button>
+
+</section>
+
+<section class="section">
+
+<h2>💌 Wish Wall</h2>
+
+<form method="post"
+action="/s/{{ event.slug }}/wish"
+class="wish-form">
+
+<input name="name" placeholder="Name">
+
+<textarea name="message"
+placeholder="Wish"></textarea>
+
+<button>Add Wish</button>
+
+</form>
+
+{% for w in wishes %}
+
+<div class="wish">
+
+```
+<b>{{ w.name }}</b>
+
+<p>{{ w.message }}</p>
+```
+
+</div>
+
+{% endfor %}
+
+</section>
+
+<section class="section reactions">
+
+<h2>Reaction</h2>
+
+<button onclick="fetch('/s/{{ event.slug }}/react/heart').then(()=>alert('Saved'))">
+❤️
+</button>
+
+<button onclick="fetch('/s/{{ event.slug }}/react/smile').then(()=>alert('Saved'))">
+😊
+</button>
+
+</section>
+
+<section class="section final-message">
+
+<h2>One Last Surprise ❤️</h2>
+
+<p>{{ event.final_message }}</p>
+
+</section>
+
+<div id="memoryModal"
+class="memory-modal hidden">
+
+```
+<div class="memory-box">
+
+    <img id="memoryImage"
+    src=""
+    style="display:none;">
+
+    <h2 id="memoryTitle"></h2>
+
+    <p id="memoryText"></p>
+
+    <button onclick="closeMemory()">
+        Close
+    </button>
+
+</div>
+```
+
+</div>
+
+<div id="rewardPopup"
+class="reward-popup hidden">
+
+```
+<div class="gift-box"
+```
+
+onclick="openGift()">
+
+```
+    🎁
+
+    <p>Tap to Open</p>
+
+</div>
+```
+
+</div>
+
+<div id="badgePopup"
+class="reward-popup hidden">
+
+```
+<div class="badge-card">
+
+    <div class="badge-icon">
+        🏅
+    </div>
+
+    <h2>
+        World's Best Mumma
+    </h2>
+
+    <p>
+        Thank you for every smile,
+        every sacrifice and every hug ❤️
+    </p>
+
+    <button onclick="closeBadge()">
+        Close
+    </button>
+
+</div>
+```
+
+</div>
+
+<script>
+
+let c = document.getElementById('game'),
+x = 20,
+score = 0,
+ctx = c.getContext('2d'),
+items = [];
+
+let level = 1;
+let targetScore = 5;
+
+const secretMemories = [
+
+{
+title:"💖 Thank You Mumma",
+text:"Thank you for every sacrifice and every hug ✨",
+image:"/uploads/1_Snapchat-1165976487.jpg"
+},
+
+{
+title:"🌸 Smile of Home",
+text:"Ghar ki asli happiness aapki smile se hi hai 🥹",
+image:"/uploads/1_Snapchat-1701752951.jpg"
+},
+
+{
+title:"🫶 Forever Support",
+text:"Aap bina bole sab samajh jaati ho ❤️",
+image:"/uploads/1_Snapchat-1512201865.jpg"
+},
+
+{
+title:"🌍 My Safe Place",
+text:"Aapke paas sab problems choti lagti hain ✨",
+image:"/uploads/1_Snapchat-1805350425.jpg"
+},
+
+{
+title:"🏅 Best Mumma Award",
+text:"Officially the sweetest mumma ever 😭❤️",
+image:"/uploads/1_Snapchat-2082367563.jpg"
+},
+
+{
+title:"✨ My World",
+text:"Mumma = Home ❤️",
+image:"/uploads/1_instasquare.photoeditor.effect.cutout_20251111371144.png"
+},
+
+{
+
+title:"🌈 My Happiness",
+
+text:"Aapki khushi hi meri duniya hai ❤️",
+
+image:"/uploads/1_Snapchat-375613557.jpg"
+
+},
+
+{
+
+title:"✨ Forever Grateful",
+
+text:"Maa... thank you for always being there 🥹",
+
+image:"/uploads/1_Snapchat-1986668182.mp4"
+
+}
+
+];
+
+function generateHearts(){
+
+   items=[];
+
+   for(let i=0;i<targetScore;i++){
+
+      items.push({
+         x:Math.random()*700+20,
+         y:Math.random()*300+40
+      });
+
+   }
+
+}
+
+generateHearts();
+
+function draw(){
+
+    ctx.clearRect(0,0,860,620);
+
+    ctx.fillStyle='#10152c';
+    ctx.fillRect(0,0,860,620);
+
+    ctx.fillStyle='#fff';
+
+    ctx.font='22px Arial';
+
+    ctx.fillText(
+    'Level: '+level+
+    ' | Score: '+score,
+    20,
+    30
+    );
+
+    ctx.fillStyle='#ff5aa7';
+
+    ctx.fillRect(x,500,40,40);
+
+    ctx.font='30px Arial';
+
+    items.forEach(item=>{
+
+       ctx.fillText(
+          '❤️',
+          item.x,
+          item.y
+       );
+
+    });
+
+}
+
+function move(d){
+
+    x += d*35;
+
+    items = items.filter(item=>{
+
+        let hit = Math.abs(x-item.x)<40;
+
+        if(hit){
+            score++;
+        }
+
+        return !hit;
+
+    });
+
+    if(items.length==0){
+
+       if(level < 3){
+
+          level++;
+
+          targetScore += 5;
+
+          alert(
+             '✨ Level '+level+' Unlocked ❤️'
+          );
+
+          generateHearts();
+
+       }
+
+       else{
+
+          showReward();
+
+       }
+
+    }
+
+    draw();
+
+}
+
+function openMemory(element){
+
+   const index =
+      Array.from(
+         document.querySelectorAll('.star')
+      ).indexOf(element);
+
+   const memory = secretMemories[index];
+
+   document
+   .getElementById('memoryTitle')
+   .innerHTML = memory.title;
+
+   document
+   .getElementById('memoryText')
+   .innerHTML = memory.text;
+
+   const img =
+   document.getElementById('memoryImage');
+
+   img.src = memory.image;
+
+   img.style.display = 'block';
+
+   img.onerror = () => {
+      img.style.display = 'none';
+   };
+
+   document
+   .getElementById('memoryModal')
+   .classList.remove('hidden');
+
+}
+
+function closeMemory(){
+
+   document
+   .getElementById('memoryModal')
+   .classList.add('hidden');
+
+}
+
+function showReward(){
+
+   document
+   .getElementById('rewardPopup')
+   .classList.remove('hidden');
+
+}
+
+function openGift(){
+
+   document
+   .getElementById('rewardPopup')
+   .classList.add('hidden');
+
+   document
+   .getElementById('badgePopup')
+   .classList.remove('hidden');
+
+   document
+   .querySelectorAll('.star')
+   .forEach(star=>{
+      star.classList.add('unlocked');
+   });
+
+}
+
+function closeBadge(){
+
+   document
+   .getElementById('badgePopup')
+   .classList.add('hidden');
+
+}
+
+draw();
+
+document.body.addEventListener(
+'click',
+function(){
+
+   const music =
+   document.getElementById('bgMusic');
+
+   music.volume = 0.25;
+
+   music.play();
+
+},
+
+{ once:true }
+
+);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="form-card wide">
+    <h1>🎉 Ready</h1>
+    <input id="share" value="{{ share_url }}" readonly>
+    <div class="actions">
+        <button onclick="navigator.clipboard.writeText(document.getElementById('share').value);
+        alert('Copied')">Copy</button>
+        <a class="btn" target="_blank" href="{{ share_url }}">Open</a>
+        <a class="btn" target="_blank" href="https://wa.me/?text={{ share_url }}">WhatsApp</a>
+        <a class="btn" href="/edit/{{ event.id }}">Edit</a>
+    </div>
+    {% if event.qr_url %}
+    <img class="qr" src="{{ event.qr_url }}">
+    {% endif %}
+</div>
+{% endblock %}
