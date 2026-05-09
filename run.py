@@ -60,14 +60,30 @@ def lang(lang): session['lang']=lang; return redirect(request.referrer or '/')
 @app.route('/mode/<mode>')
 def mode(mode): session['mode']=mode; return redirect(request.referrer or '/')
 
-@app.route('/register', methods=['GET','POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method=='POST':
-        email=request.form['email'].lower()
-        if one('SELECT id FROM users WHERE email=%s',(email,)):
-            flash('Email already registered. Please login.'); return redirect('/login')
-        execq('INSERT INTO users(name,email,password_hash,language,appearance) VALUES(%s,%s,%s,%s,%s)', (request.form['name'], email, generate_password_hash(request.form['password']), request.form.get('language','en'), request.form.get('appearance','dark')))
-        flash('Registered. Login now.'); return redirect('/login')
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email'].lower()
+        password = request.form['password']
+
+        hashed = generate_password_hash(password)
+
+        try:
+            with conn() as c:
+                with c.cursor() as cur:
+                    cur.execute(
+                        "INSERT INTO users(name,email,password_hash) VALUES(%s,%s,%s)",
+                        (name, email, hashed)
+                    )
+                c.commit()
+
+            flash('Registered. Login now.')
+            return redirect(url_for('login'))
+
+        except Exception as e:
+            return str(e)
+
     return render_template('register.html')
 
 @app.route('/login', methods=['GET','POST'])
