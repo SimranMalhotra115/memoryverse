@@ -4,3 +4,4 @@ python-dotenv
 Werkzeug
 qrcode
 Pillow
+cryptography
