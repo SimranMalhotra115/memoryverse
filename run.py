@@ -90,7 +90,7 @@ def register():
 def login():
     if request.method=='POST':
         u=one('SELECT * FROM users WHERE email=%s',(request.form['email'].lower(),))
-        if not u or not check_password_hash(u['password_hash'], request.form['password']):
+        if not u or not check_password_hash(u[3], request.form['password']):
             flash('Invalid email or password'); return redirect('/login')
         session.update(user_id=u['id'], name=u['name'], lang=u['language'], mode=u['appearance'])
         return redirect('/dashboard')
