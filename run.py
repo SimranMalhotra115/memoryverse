@@ -90,10 +90,20 @@ def register():
 def login():
     if request.method=='POST':
         u=one('SELECT * FROM users WHERE email=%s',(request.form['email'].lower(),))
+
         if not u or not check_password_hash(u[3], request.form['password']):
-            flash('Invalid email or password'); return redirect('/login')
-        session.update(user_id=u['id'], name=u['name'], lang=u['language'], mode=u['appearance'])
+            flash('Invalid email or password')
+            return redirect('/login')
+
+        session.update(
+            user_id=u[0],
+            name=u[1],
+            lang=u[4],
+            mode=u[5]
+        )
+
         return redirect('/dashboard')
+
     return render_template('login.html')
 
 @app.route('/logout')
