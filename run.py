@@ -165,9 +165,9 @@ def publish(eid):
     share = os.getenv(
     'APP_URL',
     'http://127.0.0.1:5000'
-) + '/s/' + e['slug']
+    ) + '/s/' + e['slug']
 
-qr = 'qr_' + e['slug'] + '.png'
+    qr = 'qr_' + e['slug'] + '.png'
 
     qrcode.make(share).save(
         os.path.join('app/static/uploads', qr)
