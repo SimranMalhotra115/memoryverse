@@ -152,6 +152,7 @@ def memories(eid):
         return redirect(f'/memories/{eid}')
     mem=allq('SELECT * FROM memories WHERE event_id=%s',(eid,))
     return render_template('memories.html', event=e, memories=mem)
+
 @app.route('/publish/<int:eid>')
 def publish(eid):
     if not session.get('user_id'):
@@ -162,9 +163,12 @@ def publish(eid):
         (eid, session['user_id'])
     )
 
+    if not e:
+        return "Event not found"
+
     share = os.getenv(
-    'APP_URL',
-    'http://127.0.0.1:5000'
+        'APP_URL',
+        'http://127.0.0.1:5000'
     ) + '/s/' + e['slug']
 
     qr = 'qr_' + e['slug'] + '.png'
@@ -179,6 +183,7 @@ def publish(eid):
     )
 
     return redirect(f'/share/{eid}')
+
 @app.route('/share/<int:eid>')
 def share(eid):
     if not session.get('user_id'): return redirect('/login')
