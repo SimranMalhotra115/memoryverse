@@ -11,6 +11,67 @@ app = Flask(
     static_folder='app/static'
 )
 app.secret_key = os.getenv('SECRET_KEY','secret')
+with conn() as c:
+    cur = c.cursor()
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS users(
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(120),
+        email VARCHAR(180) UNIQUE,
+        password_hash VARCHAR(255),
+        language VARCHAR(10) DEFAULT 'en',
+        appearance VARCHAR(10) DEFAULT 'dark'
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS events(
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT,
+        title VARCHAR(220),
+        receiver_name VARCHAR(140),
+        event_type VARCHAR(50),
+        subtitle VARCHAR(255),
+        final_message TEXT,
+        language VARCHAR(10),
+        appearance VARCHAR(10),
+        slug VARCHAR(160) UNIQUE,
+        status VARCHAR(40) DEFAULT 'draft',
+        qr_url VARCHAR(255)
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS memories(
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        event_id INT,
+        title VARCHAR(220),
+        description TEXT,
+        emotion_tag VARCHAR(60),
+        media_url VARCHAR(255),
+        media_type VARCHAR(30)
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS wishes(
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        event_id INT,
+        name VARCHAR(120),
+        message TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS reactions(
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        event_id INT,
+        reaction VARCHAR(40)
+    )
+    """)
+
+    c.commit()
 
 TEXT = {
  'en': {'brand':'MemoryVerse','login':'Login','register':'Register','dashboard':'Dashboard','logout':'Logout','start':'Start Building','home_title':'Create Emotional Surprise Websites','home_subtitle':'Build memories with stories, games, wishes, reactions and QR share.','create':'Create Surprise','save':'Save','publish':'Publish','edit':'Edit','share':'Share','memories':'Memories'},
