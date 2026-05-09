@@ -22,12 +22,13 @@ app.jinja_env.globals.update(t=t)
 
 def conn():
     return pymysql.connect(
-    host=os.getenv('DB_HOST'),
-    port=int(os.getenv('DB_PORT')),
-    user=os.getenv('DB_USER'),
-    password=os.getenv('DB_PASSWORD'),
-    database=os.getenv('DB_NAME')
-)
+        host=os.getenv('DB_HOST'),
+        port=int(os.getenv('DB_PORT')),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD'),
+        database=os.getenv('DB_NAME'),
+        cursorclass=pymysql.cursors.DictCursor
+    )
 
 def one(sql,args=()):
     c=conn();
@@ -42,10 +43,14 @@ def allq(sql,args=()):
     finally: c.close()
 
 def execq(sql,args=()):
-    c=conn();
+    c=conn()
     try:
-        with c.cursor() as cur: cur.execute(sql,args); return cur.lastrowid
-    finally: c.close()
+        with c.cursor() as cur:
+            cur.execute(sql,args)
+            c.commit()
+            return cur.lastrowid
+    finally:
+        c.close()
 
 def slugify(s): return re.sub(r'[^a-zA-Z0-9]+','-',s.lower()).strip('-') or 'surprise'
 
@@ -91,16 +96,16 @@ def login():
     if request.method=='POST':
         u=one('SELECT * FROM users WHERE email=%s',(request.form['email'].lower(),))
 
-        if not u or not check_password_hash(u[3], request.form['password']):
+        if not u or not check_password_hash(u['password_hash'], request.form['password']):
             flash('Invalid email or password')
             return redirect('/login')
 
         session.update(
-            user_id=u[0],
-            name=u[1],
-            lang=u[4],
-            mode=u[5]
-        )
+    user_id=u['id'],
+    name=u['name'],
+    lang=u['language'],
+    mode=u['appearance']
+)
 
         return redirect('/dashboard')
 
@@ -158,11 +163,11 @@ def publish(eid):
     )
 
     share = os.getenv(
-        'APP_URL',
-        'http://127.0.0.1:5000'
-    ) + '/s/' + e[9]
+    'APP_URL',
+    'http://127.0.0.1:5000'
+) + '/s/' + e['slug']
 
-    qr = 'qr_' + e[9] + '.png'
+qr = 'qr_' + e['slug'] + '.png'
 
     qrcode.make(share).save(
         os.path.join('app/static/uploads', qr)
