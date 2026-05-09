@@ -715,5 +715,28 @@ border:
 
 box-shadow:
 0 10px 40px rgba(255,79,163,.08);
+}
+
+.creator-footer{
+
+text-align:center;
+
+padding:35px 20px;
+
+font-size:14px;
+
+letter-spacing:1px;
+
+opacity:.75;
+
+color:#ffffffaa;
+
+}
+
+
+
+body.light .creator-footer{
+
+color:#111827aa;
 
 }
