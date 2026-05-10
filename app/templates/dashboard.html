@@ -7,5 +7,5 @@
     <p>{{ e.event_type }} • {{ e.receiver_name }}</p>
     <p>Status: {{ e.status }}</p><div class="actions">
       <a class="btn small" href="/edit/{{ e.id }}">Edit</a><a class="btn small" href="/memories/{{ e.id }}">Memories</a>
-      <a class="btn small" href="/publish/{{ e[0] }}">Publish</a>
+      <a class="btn small" href="/publish/{{ e.id }}">Publish</a>
       <a class="btn small" href="/share/{{ e.id }}">Share</a><a class="btn small" target="_blank" href="/s/{{ e.slug }}">Preview</a></div></div>{% else %}<div class="card">No project yet.</div>{% endfor %}</div>{% endblock %}
